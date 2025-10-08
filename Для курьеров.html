@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карта скидок | Курьерские льготы</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(106, 27, 154, 0.3);
+            overflow: hidden;
+            max-width: 100%;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #8e24aa, #6a1b9a);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 20px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .benefit-badge {
+            background: #f3e5f5;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 16px;
+            border: 1px solid #e1bee7;
+        }
+
+        .discount {
+            font-size: 28px;
+            font-weight: 800;
+            color: #6a1b9a;
+            line-height: 1;
+        }
+
+        .discount-label {
+            font-size: 13px;
+            color: #8e24aa;
+            margin-top: 4px;
+        }
+
+        .venue-info {
+            background: #f8f9fa;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid #8e24aa;
+        }
+
+        .venue-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #6a1b9a;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .venue-address {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .map-container {
+            height: 160px;
+            background: #e1bee7;
+            border-radius: 12px;
+            margin: 16px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6a1b9a;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-placeholder {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .map-placeholder i {
+            font-size: 40px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .action-button {
+            background: linear-gradient(135deg, #8e24aa, #6a1b9a);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            touch-action: manipulation;
+        }
+
+        .action-button:active {
+            transform: scale(0.98);
+            background: linear-gradient(135deg, #7b1fa2, #4a148c);
+        }
+
+        .instructions {
+            margin-bottom: 16px;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 10px;
+            transition: background 0.2s ease;
+        }
+
+        .instruction-item:active {
+            background: #f9f9f9;
+        }
+
+        .instruction-icon {
+            width: 28px;
+            height: 28px;
+            background: #f3e5f5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8e24aa;
+            flex-shrink: 0;
+            font-size: 12px;
+        }
+
+        .instruction-text {
+            color: #333;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .save-section {
+            text-align: center;
+            padding: 12px;
+            background: #fafafa;
+            border-radius: 12px;
+            margin-top: 8px;
+        }
+
+        .save-text {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 16px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+            font-size: 11px;
+        }
+
+        /* Оптимизация для Telegram WebView */
+        .tg-optimized {
+            -webkit-overflow-scrolling: touch;
+            overflow-scrolling: touch;
+        }
+
+        /* Предотвращение выделения текста при тапе */
+        .no-select {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body class="tg-optimized no-select">
+    <div class="card">
+        <div class="card-header">
+            <div class="logo">
+                <i class="fas fa-motorcycle"></i>
+            </div>
+            <h1 class="card-title">Карта скидок</h1>
+            <p class="card-subtitle">Ваши эксклюзивные льготы</p>
+        </div>
+        
+        <div class="card-body">
+            <div class="benefit-badge">
+                <div class="discount">10% СКИДКА</div>
+                <div class="discount-label">на всё меню</div>
+            </div>
+            
+            <div class="venue-info">
+                <div class="venue-name">
+                    <i class="fas fa-utensils"></i>
+                    Мини-ресторан
+                </div>
+                <div class="venue-address">
+                    <strong>Координаты:</strong> 55.816106, 37.461041<br>
+                    <strong>Зона действия:</strong> 5 км от ресторана
+                </div>
+            </div>
+
+            <div class="map-container">
+                <div class="map-placeholder">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <div>Карта расположения</div>
+                    <div style="font-size: 11px; margin-top: 6px; opacity: 0.8;">Нажмите кнопку ниже для навигации</div>
+                </div>
+            </div>
+
+            <button class="action-button" onclick="openNavigation()">
+                <i class="fas fa-map-marker-alt"></i> Открыть в навигаторе
+            </button>
+            
+            <div class="instructions">
+                <div class="instruction-item">
+                    <div class="instruction-icon">
+                        <i class="fas fa-1"></i>
+                    </div>
+                    <div class="instruction-text">
+                        Подойдите к сотруднику и представьтесь курьером нашей компании , Доброе такси
+                    </div>
+                </div>
+                <div class="instruction-item">
+                    <div class="instruction-icon">
+                        <i class="fas fa-2"></i>
+                    </div>
+                    <div class="instruction-text">
+                        Покажите эту карту на телефоне
+                    </div>
+                </div>
+                <div class="instruction-item">
+                    <div class="instruction-icon">
+                        <i class="fas fa-3"></i>
+                    </div>
+                    <div class="instruction-text">
+                        Получите скидку 10% на всё меню мини-ресторана
+                    </div>
+                </div>
+            </div>
+            
+            <div class="save-section">
+                <div class="save-text">
+                    💡 <strong>Совет:</strong> Добавьте это сообщение в "Избранное"<br>
+                    для быстрого доступа в будущем
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            Действует только для действующих курьеров<br>
+            Обновлено: 2025
+        </div>
+    </div>
+
+    <script>
+        // Инициализация Telegram Web App
+        let tg = null;
+        try {
+            tg = window.Telegram.WebApp;
+            if (tg) {
+                tg.expand(); // Раскрываем на весь экран
+                tg.enableClosingConfirmation(); // Подтверждение закрытия
+            }
+        } catch (e) {
+            console.log('Не в Telegram WebView');
+        }
+
+        function openNavigation() {
+            const lat = 55.816106;
+            const lon = 37.461041;
+            
+            // Универсальные ссылки для навигации
+            const links = {
+                yandex: `https://yandex.ru/maps/?pt=${lon},${lat}&z=17&l=map`,
+                yandexNavi: `yandexnavi://build_route_on_map?lat_to=${lat}&lon_to=${lon}`,
+                google: `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`,
+                googleMaps: `comgooglemaps://?daddr=${lat},${lon}`,
+                apple: `http://maps.apple.com/?daddr=${lat},${lon}`
+            };
+            
+            // Пытаемся открыть в приложении Яндекс Навигатор
+            window.location.href = links.yandexNavi;
+            
+            // Если не получилось, через 500ms открываем веб-версию
+            setTimeout(() => {
+                window.open(links.yandex, '_blank');
+            }, 500);
+        }
+
+        // Оптимизация для мобильных устройств
+        document.addEventListener('touchstart', function() {}, {passive: true});
+        
+        // Предотвращение масштабирования при двойном тапе
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Улучшенная обработка нажатий для мобильных
+        document.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
